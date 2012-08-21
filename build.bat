@@ -1,1 +1,1 @@
-dmd main.d -IC:\Users\alaran\Documents\GitHub\Derelict3\import C:\Users\alaran\Documents\GitHub\Derelict3\lib\DerelictSDL2.lib C:\Users\alaran\Documents\GitHub\Derelict3\lib\DerelictUtil.lib
+dmd main.d -I..\Derelict3\import ..\Derelict3\lib\DerelictSDL2.lib ..\Derelict3\lib\DerelictUtil.lib
