@@ -36,6 +36,10 @@ private int[] doAI(in byte[][] map, int[2] location, in int[2] desired_location,
 	int[] north = [0,0,0], east = [0,0,0], south = [0,0,0], west = [0,0,0];
 	// Setting a max value and the max value for moves
 	int max_val = 2147483647, moves = max_val;
+	//If we're outside the map, then break the function
+	if(location[0] < 0 || location[1] < 0) {
+		return [0,0,max_val];
+	}
 	// If we're at the target, then stop
 	if ((location[0] == desired_location[0]) & (location[1] == desired_location[1])) {
 		return [location[0], location[1], 0];
@@ -51,32 +55,32 @@ private int[] doAI(in byte[][] map, int[2] location, in int[2] desired_location,
 	//TODO: remove redundant moves, make this work
 	if ((map[location[0]][location[1]]&1)!=1) {
 		int[][] north_dir;
-		north_dir[0] = doAI(map, [location[0], location[1]+1], desired_location, have_been);
-		north_dir[1] = doAI(map, [location[0]+1,location[1]+1], desired_location, have_been);
-		north_dir[2] = doAI(map, [location[0]-1,location[1]+1], desired_location, have_been);
+		north_dir[0] = doAI(map, [location[0]-1,location[1]-1], desired_location, have_been);
+		north_dir[1] = doAI(map, [location[0],  location[1]-1], desired_location, have_been);
+		north_dir[2] = doAI(map, [location[0]+1,location[1]-1], desired_location, have_been);
 		north = getShortPath(north_dir);
 	}
 
 	if ((map[location[0]][location[1]]&2)!=2) {
 		int[][] east_dir;
-		east_dir[0] = doAI(map, [location[0], location[1]+1], desired_location, have_been);
-		east_dir[1] = doAI(map, [location[0]+1,location[1]+1], desired_location, have_been);
-		east_dir[2] = doAI(map, [location[0]-1,location[1]+1], desired_location, have_been);
+		east_dir[0] = doAI(map, [location[0]+1,location[1]-1], desired_location, have_been);
+		east_dir[1] = doAI(map, [location[0]+1,location[1]], desired_location, have_been);
+		east_dir[2] = doAI(map, [location[0]+1,location[1]+1], desired_location, have_been);
 		east = getShortPath(east_dir);
 	}
 
 	if ((map[location[0]][location[1]]&4)!=4) {
 		int[][] south_dir;
-		south_dir[0] = doAI(map, [location[0], location[1]+1], desired_location, have_been);
-		south_dir[1] = doAI(map, [location[0]+1,location[1]+1], desired_location, have_been);
-		south_dir[2] = doAI(map, [location[0]-1,location[1]+1], desired_location, have_been);
+		south_dir[0] = doAI(map, [location[0]-1,location[1]+1], desired_location, have_been);
+		south_dir[1] = doAI(map, [location[0],  location[1]+1], desired_location, have_been);
+		south_dir[2] = doAI(map, [location[0]+1,location[1]+1], desired_location, have_been);
 		south = getShortPath(south_dir);
 	}
 
 	if ((map[location[0]][location[1]]&8)!=8) {
 		int[][] west_dir;
-		west_dir[0] = doAI(map, [location[0], location[1]+1], desired_location, have_been);
-		west_dir[1] = doAI(map, [location[0]+1,location[1]+1], desired_location, have_been);
+		west_dir[0] = doAI(map, [location[0]-1,location[1]-1], desired_location, have_been);
+		west_dir[1] = doAI(map, [location[0]-1,location[1]], desired_location, have_been);
 		west_dir[2] = doAI(map, [location[0]-1,location[1]+1], desired_location, have_been);
 		west = getShortPath(west_dir);
 	}
@@ -91,6 +95,7 @@ private int[] doAI(in byte[][] map, int[2] location, in int[2] desired_location,
 	// Return next move
 	foreach (int i[]; [north, east, south, west]) {
 		if (i[2] == moves) {
+			i[2]++;
 			return i;
 		}
 	}
