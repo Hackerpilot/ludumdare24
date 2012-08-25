@@ -92,7 +92,7 @@ private int[] doAI(in byte[][] map, int[2] location, in int[2] desired_location,
 		return [0,0,max_val];
 	}
 
-	return getShortPath(north, east, south, west);
+	return getShortPath([north, east, south, west]);
 }
 
 private int[] getShortPath(int[][] path) {
@@ -109,4 +109,13 @@ private int[] getShortPath(int[][] path) {
 		}
 	}
 	return [0,0,max_val];
+}
+
+unittest{
+	int[][] i;
+	i[0] = [0,0,0];
+	i[1] = [0,0,0];
+	i[2] = [0,0,0];
+	i[3] = [0,0,0];
+	assert(getShortPath(i)==[0,0,0]);
 }
