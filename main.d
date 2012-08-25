@@ -1,27 +1,116 @@
 import std.string;
+import std.stdio;
+import std.json;
 import derelict.sdl2.sdl;
+import derelict.sdl2.image;
+import map;
 
-void main() {
-	DerelictSDL2.load("./SDL2.dll");
-	SDL_Init(SDL_INIT_VIDEO);
+
+immutable int SCREEN_WIDTH = 800;
+immutable int SCREEN_HEIGHT = 600;
+
+void main(string[] args)
+{
+	DerelictSDL2.load("./libSDL2.so");
+	DerelictSDL2Image.load("./libSDL2_image.so");
 	scope(exit) SDL_Quit();
-	
-	SDL_Window* window = SDL_CreateWindow(toStringz("Hello World"),
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_SHOWN);
-	scope(exit) SDL_DestroyWindow(window);	
-		
+	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_NO_PARACHUTE|SDL_INIT_TIMER);
+
+	SDL_Window* window = SDL_CreateWindow(toStringz("Test Window"),
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
+		SCREEN_HEIGHT, 0);
+	scope(exit) SDL_DestroyWindow(window);
+
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	scope(exit) SDL_DestroyRenderer(renderer);
-	
-	SDL_Rect rect;
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = 100;
-	rect.h = 100;
-	SDL_RenderClear(renderer);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 128);
-	SDL_RenderFillRect(renderer, &rect);
-	SDL_RenderPresent(renderer);
-	
-	SDL_Delay(3000);
+
+	TileMap* map;
+	try
+	{
+		map = loadTileMap("map1.json", renderer);
+	}
+	catch (JSONException e)
+	{
+		writeln(e.msg);
+	}
+	catch (Exception e)
+	{
+		writeln(e.msg);
+	}
+
+
+	SDL_Event event;
+	bool quit = false;
+	SDL_Rect camera;
+	camera.x = 0;
+	camera.y = 0;
+	camera.w = SCREEN_WIDTH;
+	camera.h = SCREEN_HEIGHT;
+
+
+	bool[4] arrowKeys;
+
+	while (!quit)
+	{
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_RenderClear(renderer);
+		map.draw(camera, renderer, true);
+		SDL_RenderPresent(renderer);
+
+		while(SDL_PollEvent(&event))
+		{
+			switch (event.type)
+			{
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym)
+				{
+				case SDLK_ESCAPE:
+					quit = true;
+					break;
+				case SDLK_UP:
+					arrowKeys[0] = true;
+					break;
+				case SDLK_RIGHT:
+					arrowKeys[1] = true;
+					break;
+				case SDLK_DOWN:
+					arrowKeys[2] = true;
+					break;
+				case SDLK_LEFT:
+					arrowKeys[3] = true;
+					break;
+				default:
+					break;
+				}
+				break;
+			case SDL_KEYUP:
+				switch (event.key.keysym.sym)
+				{
+				case SDLK_UP:
+					arrowKeys[0] = false;
+					break;
+				case SDLK_RIGHT:
+					arrowKeys[1] = false;
+					break;
+				case SDLK_DOWN:
+					arrowKeys[2] = false;
+					break;
+				case SDLK_LEFT:
+					arrowKeys[3] = false;
+					break;
+				default:
+					break;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+
+		if (arrowKeys[0]) camera.y -= 4;
+		if (arrowKeys[1]) camera.x += 4;
+		if (arrowKeys[2]) camera.y += 4;
+		if (arrowKeys[3]) camera.x -= 4;
+
+		SDL_Delay(16);
+	}
 }
