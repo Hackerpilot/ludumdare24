@@ -17,7 +17,7 @@ public int[] AICall(byte[][] map, int[2] location, in int[2] desired_location) {
 	const int tile_width = 32;
 	//Initialize have_been map
 	bool[][] have_been;
-	foreach (int i; 0 .. have_been[0].length-1) {
+	foreach (int i; 0 .. have_been[0].length) {
 		have_been[i].length = map[0].length;
 	}
 	have_been[location[0]][location[1]] = true;
@@ -32,10 +32,10 @@ private int[] doAI(in byte[][] map, int[2] location, in int[2] desired_location,
 	Location will always be passed [x,y]
 	move_score will always be positive
 	*/
-	// Setting min values for each direction
-	int[] north = [0,0,0], east = [0,0,0], south = [0,0,0], west = [0,0,0];
 	// Setting a max value and the max value for moves
 	int max_val = 2147483647, moves = max_val;
+	// Setting min values for each direction
+	int[] north = [0,0,max_val], east = [0,0,max_val], south = [0,0,max_val], west = [0,0,max_val];
 	//If we're outside the map, then break the function
 	if(location[0] < 0 || location[1] < 0) {
 		return [0,0,max_val];
@@ -86,20 +86,13 @@ private int[] doAI(in byte[][] map, int[2] location, in int[2] desired_location,
 	}
 
 	// Find out the fastest way to the target
-	// If path dead-ends, return max_val
+	// If path dead-ends, return [0,0,max_val]
 	moves = min(moves, north[3], east[3], south[3], west[3]);
 	if(moves == max_val) {
 		return [0,0,max_val];
 	}
 
-	// Return next move
-	foreach (int i[]; [north, east, south, west]) {
-		if (i[2] == moves) {
-			i[2]++;
-			return i;
-		}
-	}
-	return [0];
+	return getShortPath(north, east, south, west);
 }
 
 private int[] getShortPath(int[][] path) {
@@ -116,8 +109,4 @@ private int[] getShortPath(int[][] path) {
 		}
 	}
 	return [0,0,max_val];
-
-
-
-
 }
