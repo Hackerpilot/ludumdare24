@@ -1,4 +1,4 @@
-import std.algorithem;
+import std.algorithm;
 
 /*
 AI file for Ludum Dare 24 started at 8:15 on 8/24/2012
@@ -58,7 +58,7 @@ private int[] doAI(in byte[][] map, int[2] location, int[2] desired_location, bo
 
 	moves = min(moves, north[3], east[3], south[3], west[3]);
 	if(moves == 2147483647) {
-		return [location[0]. location[1], moves];
+		return [location[0], location[1], moves];
 	}
 
 	foreach (int[] i; [north, east, south, west]) {
