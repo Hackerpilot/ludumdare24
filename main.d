@@ -39,10 +39,6 @@ void main(string[] args)
 	{
 		map = loadTileMap("maps/map1.json", renderer);
 	}
-	catch (JSONException e)
-	{
-		writeln(e.msg);
-	}
 	catch (Exception e)
 	{
 		writeln(e.msg);
@@ -57,15 +53,18 @@ void main(string[] args)
 	camera.w = SCREEN_WIDTH;
 	camera.h = SCREEN_HEIGHT;
 
+	SDL_Rect playerRect;
+	playerRect.x = 32;
+	playerRect.y = 64;
+	playerRect.w = 22;
+	playerRect.h = 50;
+
 
 	bool[4] arrowKeys;
 
 	while (!quit)
 	{
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-		SDL_RenderClear(renderer);
-		map.draw(camera, renderer, true);
-		SDL_RenderPresent(renderer);
+
 
 		while(SDL_PollEvent(&event))
 		{
@@ -117,10 +116,27 @@ void main(string[] args)
 			}
 		}
 
-		if (arrowKeys[0]) camera.y -= 4;
-		if (arrowKeys[1]) camera.x += 4;
-		if (arrowKeys[2]) camera.y += 4;
-		if (arrowKeys[3]) camera.x -= 4;
+		int playerXVel;
+		int playerYVel;
+
+
+		if (arrowKeys[0]) playerYVel = -4;
+		if (arrowKeys[2]) playerYVel = 4;
+		if (arrowKeys[1]) playerXVel = 4;
+		if (arrowKeys[3]) playerXVel = -4;
+
+		playerRect.x += playerXVel;
+		playerRect.y += playerYVel;
+
+		checkCollision(playerRect, map, playerXVel,
+			playerYVel) ;
+
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_RenderClear(renderer);
+		map.draw(camera, renderer, true);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+		SDL_RenderFillRect(renderer, &playerRect);
+		SDL_RenderPresent(renderer);
 
 		SDL_Delay(16);
 	}

@@ -206,7 +206,9 @@ body
 	return map;
 }
 
-
+/**
+ * For debugging
+ */
 void drawCollisionInfo(ref SDL_Rect cameraRect, SDL_Renderer* renderer, byte[][] blockInfo)
 {
 	foreach(int i, column; blockInfo)
@@ -256,6 +258,67 @@ void drawCollisionInfo(ref SDL_Rect cameraRect, SDL_Renderer* renderer, byte[][]
 				SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
 				SDL_RenderFillRect(renderer, &rect);
 			}
+		}
+	}
+}
+
+/**
+ * Returns: the offset that should be applied to the input rectangle to make it
+ * not violate terrain passing rules.
+ * Params:
+ *     objectPosition = the rectangle being tested
+ *     xVel = rectangle's x velocity
+ *     yVel = rectangle's y velocity
+ */
+void checkCollision(ref SDL_Rect objectPosition, const TileMap* map,
+	int xVel, int yVel)
+in
+{
+	assert(xVel < TILE_SIZE / 4 && xVel > -(TILE_SIZE / 4));
+	assert(yVel < TILE_SIZE / 4 && yVel > -(TILE_SIZE / 4));
+}
+body
+{
+	SDL_Point topLeftTileCoord;
+	topLeftTileCoord.x = objectPosition.x / TILE_SIZE;
+	topLeftTileCoord.y = objectPosition.y / TILE_SIZE;
+
+	SDL_Point bottomRightTileCoord;
+	bottomRightTileCoord.x = (objectPosition.x + objectPosition.w) / TILE_SIZE;
+	bottomRightTileCoord.y = (objectPosition.y + objectPosition.h) / TILE_SIZE;
+
+	// Left
+	if (xVel < 0) foreach (i; topLeftTileCoord.y .. bottomRightTileCoord.y + 1)
+	{
+		if (map.blockInfo[topLeftTileCoord.x + 1][i] & BLOCK_LEFT)
+		{
+			objectPosition.x = (topLeftTileCoord.x + 1) * TILE_SIZE;
+			bottomRightTileCoord.x = (objectPosition.x + objectPosition.w) / TILE_SIZE;
+			topLeftTileCoord.x = objectPosition.x / TILE_SIZE;
+		}
+	}
+	else if (xVel > 0) foreach (i; topLeftTileCoord.y .. bottomRightTileCoord.y + 1)
+	{
+		if (map.blockInfo[bottomRightTileCoord.x - 1][i] & BLOCK_RIGHT)
+		{
+			objectPosition.x = ((bottomRightTileCoord.x) * TILE_SIZE) - objectPosition.w;
+			bottomRightTileCoord.x = (objectPosition.x + objectPosition.w) / TILE_SIZE;
+			topLeftTileCoord.x = objectPosition.x / TILE_SIZE;
+		}
+	}
+
+	if (yVel < 0) foreach (i; topLeftTileCoord.x .. bottomRightTileCoord.x + 1)
+	{
+		if (map.blockInfo[i][topLeftTileCoord.y + 1] & BLOCK_TOP)
+		{
+			objectPosition.y = (topLeftTileCoord.y + 1) * TILE_SIZE;
+		}
+	}
+	else if (yVel > 0) foreach (i; topLeftTileCoord.x .. bottomRightTileCoord.x + 1)
+	{
+		if (map.blockInfo[i][bottomRightTileCoord.y - 1] & BLOCK_BOTTOM)
+		{
+			objectPosition.y = ((bottomRightTileCoord.y) * TILE_SIZE) - objectPosition.h;
 		}
 	}
 }
