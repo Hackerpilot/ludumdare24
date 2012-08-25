@@ -1,3 +1,5 @@
+module main;
+
 import std.string;
 import std.stdio;
 import std.json;
@@ -11,8 +13,17 @@ immutable int SCREEN_HEIGHT = 600;
 
 void main(string[] args)
 {
-	DerelictSDL2.load("./libSDL2.so");
-	DerelictSDL2Image.load("./libSDL2_image.so");
+	version (linux)
+	{
+		DerelictSDL2.load("./libSDL2.so");
+		DerelictSDL2Image.load("./libSDL2_image.so");
+	}
+	else version(Win32)
+	{
+		DerelictSDL2.load();
+		DerelictSDL2Image.load();
+	}
+
 	scope(exit) SDL_Quit();
 	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_NO_PARACHUTE|SDL_INIT_TIMER);
 
@@ -26,7 +37,7 @@ void main(string[] args)
 	TileMap* map;
 	try
 	{
-		map = loadTileMap("map1.json", renderer);
+		map = loadTileMap("maps/map1.json", renderer);
 	}
 	catch (JSONException e)
 	{

@@ -181,8 +181,14 @@ body
 		string imageFileName = image.object["fileName"].str;
 
 		writeln("creating the texture");
-		SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer,
-			IMG_Load(toStringz(imageFileName)));
+		SDL_Surface* surf = IMG_Load(toStringz(imageFileName));
+		if (surf is null)
+		{
+			writeln("Could not load ", imageFileName);
+			continue;
+		}
+		SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
+		SDL_FreeSurface(surf);
 		writeln("texture loaded");
 		writeln("");
 		if (index >= map.textures.length)
