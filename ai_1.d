@@ -10,14 +10,16 @@ Player pixel location to be divided by 32 to get player location
 assuming tiles 32 pixels wide
 will assign variable for this
 */
-public int[] AICall(byte[][] map, int[2] location) {
+public int[] AICall(byte[][] map, int[2] location, int[2] desired_location) {
 	const int tile_width = 32;
-	
-	int[] loc_move = doAI(map, [location[0]/tile_width, location[1]/tile_width], 0);
+
+	bool[map.length-1][map[0].length-1] have_been;
+	have_been[location[0]][location[1]] = true;
+	int[] loc_move = doAI(map, [location[0]/tile_width, location[1]/tile_width], desired_location, have_been);
 	return [loc_move[0], loc_move[1]];
 }
 
-private int[] doAI(in byte[][] map, int[2] location, int[2] desired_location) {
+private int[] doAI(in byte[][] map, int[2] location, int[2] desired_location, bool[][] have_been) {
 	/*Assume:
 	For every byte in map, bit order goes (west), (south), (east), (north)
 	Location will always be passed [x,y]
@@ -26,24 +28,26 @@ private int[] doAI(in byte[][] map, int[2] location, int[2] desired_location) {
 
 	int[] north = [0,0,0], east = [0,0,0], south = [0,0,0], west = [0,0,0];
 
-	if (location[0]==desired_location[0] AND location[1]==desired_location[1]) {
+	if ((location[0] == desired_location[0]) & (location[1] == desired_location[1])) {
 		return [location[0], location[1], 0];
 	}
 
-	if (map[location[0]][location[1]]&1==1){
+	if ((map[location[0]][location[1]]&1)==1) {
 
 	}
 
-	if (map[location[0]][location[1]]&2==2){
+	if ((map[location[0]][location[1]]&2)==2) {
 		
 	}
 
-	if (map[location[0]][location[1]]&4==4){
+	if ((map[location[0]][location[1]]&4)==4) {
 		
 	}
 
-	if (map[location[0]][location[1]]&8==8){
+	if ((map[location[0]][location[1]]&8)==8) {
 		
 	}
+
+	//return
 
 }
